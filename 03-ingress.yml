@@ -1,0 +1,26 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kibana
+  namespace: sandbox
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+#    kubernetes.io/tls-acme: "true"
+#    ingress.kubernetes.io/force-ssl-redirect: "true"
+spec:
+  rules:
+    - host: kibana.sgnw.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: kibana
+                port:
+                  number: 5601
+#  tls:
+#  - hosts:
+#    - kibana.sgnw.io
+#    secretName: ingress-secret

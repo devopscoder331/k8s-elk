@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: simple-app
+  namespace: sandbox
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: simple-app
+  template:
+    metadata:
+      labels:
+        app: simple-app
+    spec:
+      containers:
+        - name: simple-app
+          image: nginx
+          resources:
+            limits:
+              cpu: 100m
+            requests:
+              cpu: 100m
+          ports:
+            - containerPort: 80
+              name: http-80
+              protocol: TCP
+          volumeMounts:
+          - name: log
+            mountPath: /var/log/nginx
+        - name: fluent-bit
+          image: fluent/fluent-bit
+          volumeMounts:
+          - name: log
+            mountPath: /var/log
+          - name: fluent-bit-config
+            mountPath: /fluent-bit/etc/
+          env:
+            - name: FLUENT_ELASTICSEARCH_HOST
+              value: elasticsearch
+            - name: FLUENT_ELASTICSEARCH_PORT
+              value: "9200"
+      volumes:
+        - name: log
+          emptyDir: {}
+        - name: fluent-bit-config
+          configMap:
+            defaultMode: 420
+            name: fluent-bit-config
+      
